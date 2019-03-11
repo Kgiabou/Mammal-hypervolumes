@@ -78,3 +78,33 @@ for (s in seq_along(species_list))
     write.table(distances, file=paste(species_list[s], "distances.txt", sep="_"), col.names = TRUE, quote=FALSE, row.names = TRUE, sep="\t")
   }
 }
+
+#### Measuring Overlap Between humans and fauna ###
+
+hypers <- ls(pattern = "_hypervolume")[-c(10)] ### exclude Saiga and Humans from the list
+hyp <- lapply(hypers, get)
+
+for (h in seq_along(hyp))
+{
+  nam <- vector()
+  Overlap <- matrix(NA, nrow=length(seq_along(hyp[[h]]@HVList)), ncol=1)
+  Distances <- matrix(NA, nrow=length(seq_along(hyp[[h]]@HVList)), ncol=1)
+  for (i in seq_along(hv_humans_list@HVList))
+  { 
+    for (j in seq_along(hyp[[h]]@HVList))
+    {
+      if (as.numeric(strsplit(strsplit(hv_humans_list@HVList[[i]]@Name, split="_")[[1]][3], split="k")[[1]])== as.numeric(strsplit(strsplit(hyp[[h]]@HVList[[j]]@Name, split="_")[[1]][3], split="k")[[1]]))
+      {
+        this_set <- hypervolume_set(hv_humans_list@HVList[[i]], hyp[[h]]@HVList[[j]], npoints_max=NULL, verbose = TRUE, check_memory = FALSE, distance_factor = 1)
+        Overlap[j,1] <- hypervolume_sorensen_overlap(this_set)
+        Distances[j,1] <- hypervolume_distance(hv_humans_list@HVList[[i]], hyp[[h]]@HVList[[j]], type = "centroid", check_memory = TRUE)
+        nam <- c(nam, hyp[[h]]@HVList[[j]]@Name)
+      }
+    }
+  }
+  Overlap <- matrix(Overlap[1:length(nam)], nrow=length(nam))
+  dimnames(Overlap) <- list(nam, paste("Overlap"))
+  assign(paste(strsplit(hypers[h], split="_hypervolume", fixed=TRUE)[[1]][1], "_humans_overlap", sep=""), Overlap)
+  write.table(Overlap, file=paste(strsplit(hypers[h], split="_hypervolume", fixed=TRUE)[[1]][1], "_humans_overlap.txt", sep=""), col.names=TRUE, quote=FALSE, row.names=TRUE, sep="\t")
+}
+
