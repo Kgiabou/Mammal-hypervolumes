@@ -1,11 +1,15 @@
 setwd("C:/Users/kgiab/Desktop/Project 2 PhD/2nd Chpapter ANALYSES/Human localities again/BENS SUGGESTION HYPERVOLUME")
 require(vioplot)
 require(lattice)
-
+## Create a data frame with the time bins we have used for the analyses ##
 vol_bins <- data.frame(Time=c(seq(8,21,1), seq(22,46,2)))
 occ <- as.vector(NULL)
 nam <- as.vector(NULL)
 ints <- as.vector(NULL)
+
+## Extract the names of the species for which we had enough data to run the analyses
+## and we have an output
+
 for(ss in seq_along(dir(pattern = "_volumes.txt")[-c(7,11,12,15)]))
 {
 n <- strsplit(dir(pattern = "_volumes.txt")[-c(7,11,12,15)][ss], split="_volumes.txt")[[1]][1]
@@ -13,15 +17,20 @@ nam <- c(nam, n)
 }
 species_list <- nam
 name <- as.vector(NULL)
+## Goes through the species list with an output and reads in the files 
+## for the niche hypervolume and the number of occurrences per time bin
 for(vv in seq_along(species_list))
 {
 Vol <- read.delim(paste(species_list[vv], "_volumes.txt", sep=""), h=T, sep="\t")
 Ocs <- read.delim(paste(species_list[vv],"_Occurrences.txt", sep=""), h=T, sep="\t")
 timeX2 <- vector()
+## Extracts the time bins for each measurement from the rownames ##
 for(tt in seq_along(rownames(Vol)))
 {
 timeX2 <- c(timeX2, as.numeric(strsplit(strsplit(rownames(Vol), split="_")[[tt]][3], split="k")))
 }
+## Takes the volume measurments and mathces them to the respective time bin on the 
+## vol_bins data frame
 for(j in seq_along(timeX2))
 {
 for(rr in seq_along(vol_bins$Time))
