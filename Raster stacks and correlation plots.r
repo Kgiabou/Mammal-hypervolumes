@@ -54,19 +54,3 @@ for(cli in seq_along(ls(pattern = "climatelayers"))[-26])
   setwd("C:/Users/Ksq450/Desktop/Project 2 PhD/2nd Chpapter ANALYSES/Seasonal maps_Eurasia/Z-score seasonal maps for Analyses")
   writeRaster(cl2, filename = names(cl2), format="ascii", bylayer=TRUE)
 }
-
-dir.create("Z-score seasonal maps for Analyses")
-for(cli in seq_along(ls(pattern = "climatelayers"))[-26])
-{
-  setwd("C:/Users/Ksq450/Desktop/Project 2 PhD/2nd Chpapter ANALYSES/Seasonal maps_Eurasia")
-  cl<- get(ls(pattern = "climatelayers")[cli])
-  cl2 <- subset(cl, subset=c(3,4,7))
-  for (i in 1:nlayers(cl2)) 
-  {  
-    cl2[[i]] <- (cl2[[i]] - cellStats(cl2[[i]], 'mean')) / cellStats(cl2[[i]], 'sd')
-    names(cl2)[[i]] <- paste("Z_", strsplit(ls(pattern = "climatelayers")[cli], split="_")[[1]][2], "_", names(cl2)[[i]], sep="")
-  }
-  assign(paste("Z_score_variables_", strsplit(ls(pattern = "climatelayers")[cli], split="_")[[1]][2], sep=""), cl2)
-  setwd("C:/Users/Ksq450/Desktop/Project 2 PhD/2nd Chpapter ANALYSES/Seasonal maps_Eurasia/Z-score seasonal maps for Analyses")
-  writeRaster(cl2, filename = names(cl2), format="ascii", bylayer=TRUE)
-}
